@@ -9,8 +9,11 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "JapanHolidays",
-            targets: ["JapanHolidays"]
+            targets: ["JapanHolidays", "JapanHolidaysObjC"]
         ),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/AliSoftware/OHHTTPStubs?tab=readme-ov-file", from: "9.1.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -18,9 +21,17 @@ let package = Package(
         .target(
             name: "JapanHolidays"
         ),
+        .target(
+            name: "JapanHolidaysObjC",
+            dependencies: ["JapanHolidays"]
+        ),
         .testTarget(
             name: "JapanHolidaysTests",
-            dependencies: ["JapanHolidays"]
+            dependencies: [
+                "JapanHolidays",
+                .product(name: "OHHTTPStubs", package: "OHHTTPStubs?tab=readme-ov-file"),
+                .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs?tab=readme-ov-file")
+            ]
         ),
     ]
 )
