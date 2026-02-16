@@ -7,6 +7,9 @@
 
 File -> Add Package Dependencies... から `https://github.com/kenji-fujisawa/JapanHolidays_Swift` を追加してください
 
+macOS 向けのアプリの場合は App Sandbox の設定で Outgoing Connections を有効にしてください  
+<img width="426" height="85" alt="Image" src="https://github.com/user-attachments/assets/3d4b761b-6e58-4b4f-8885-8d1b7d01e6aa" />
+
 ## 使用方法
 
 ### 祝日判定
