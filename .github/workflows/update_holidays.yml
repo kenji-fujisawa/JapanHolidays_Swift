@@ -54,16 +54,16 @@ jobs:
       - name: commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "v${{ steps.increment_version.outputs.version }}"
+          commit_message: "v${{ steps.get_new_version.outputs.version }}"
 
       - name: tag
         run: |
-          git tag ${{ steps.increment_version.outputs.version }}
-          git push origin ${{ steps.increment_version.outputs.version }}
+          git tag ${{ steps.get_new_version.outputs.version }}
+          git push origin ${{ steps.get_new_version.outputs.version }}
 
       - name: release
         uses: svenstaro/upload-release-action@v2
         with:
-          release_name: v${{ steps.increment_version.outputs.version }}
-          tag: ${{ steps.increment_version.outputs.version }}
+          release_name: v${{ steps.get_new_version.outputs.version }}
+          tag: ${{ steps.get_new_version.outputs.version }}
           overwrite: true
