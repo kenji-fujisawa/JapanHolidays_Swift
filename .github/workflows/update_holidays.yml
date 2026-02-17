@@ -1,0 +1,69 @@
+name: Update Holidays
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 1 * *"
+
+jobs:
+  download:
+    name: download and check changes
+    runs-on: ubuntu-latest
+
+    outputs:
+      changed: ${{ steps.filter.outputs.changed }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: download latest csv
+        run: ./scripts/update_holidays.sh
+
+      - name: check changes
+        id: filter
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  commit:
+    name: commit and release
+    needs: download
+    if: ${{ needs.download.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: download latest csv
+        run: ./scripts/update_holidays.sh
+
+      - name: get new version
+        id: get_new_version
+        run: |
+          RESULT=$(./scripts/get_new_version.sh)
+          echo "version=${RESULT}" >> "$GITHUB_OUTPUT"
+
+      - name: commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "v${{ steps.increment_version.outputs.version }}"
+
+      - name: tag
+        run: |
+          git tag ${{ steps.increment_version.outputs.version }}
+          git push origin ${{ steps.increment_version.outputs.version }}
+
+      - name: release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          release_name: v${{ steps.increment_version.outputs.version }}
+          tag: ${{ steps.increment_version.outputs.version }}
+          overwrite: true
